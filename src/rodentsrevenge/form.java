@@ -2,6 +2,7 @@ package rodentsrevenge;
 
 import java.awt.BorderLayout;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 public class form extends JFrame{
@@ -19,6 +20,8 @@ public class form extends JFrame{
 		 mapa.setFocusable(true);
 		 mapa.requestFocusInWindow();
 		// pack();
+		 ImageIcon img = new ImageIcon("./images/mouse.png");
+		 this.setIconImage(img.getImage());
 		 this.setVisible(true);
 
 
