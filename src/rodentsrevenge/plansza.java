@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -19,10 +21,11 @@ import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 
 
-public class plansza extends JPanel implements KeyListener{
+public class plansza extends JPanel implements KeyListener, ActionListener{
 
 	BufferedImage[] zdj_pola ;
 	public int[][] tablica = new int[23][23];
@@ -30,9 +33,14 @@ public class plansza extends JPanel implements KeyListener{
 	ArrayList<kot> kocury;
 	List<Integer> fale;
 	public int aktualna_fala;
+	Timer Truch_kota;
+	boolean koniec_fali;
+	int punkty;
+	int poziom;
 	
 	public plansza() {
 		//this.setSize(384 ,408);
+		poziom=1;
 		zdj_pola = new BufferedImage[9];
 		gracz = new mysz();
 		kocury = new ArrayList<kot>();
@@ -40,6 +48,10 @@ public class plansza extends JPanel implements KeyListener{
 		this.addKeyListener(this);
 		wczytaj_zdjecia();
 		wczytaj_level();
+		punkty=0;
+		Truch_kota=new Timer(1000, this);
+		Truch_kota.start();
+		spawn();
 	}
 	
 	
@@ -74,12 +86,16 @@ public class plansza extends JPanel implements KeyListener{
 		
 		File mysza = new File("./images/mouse.png");
 		File kot = new File("./images/cat.png");
+		File kot_spi = new File("./images/cat_awaiting.png");
+		File ser = new File("./images/cheese.png");
 		try {
 		zdj_pola[0]  = ImageIO.read(voidd);
 		zdj_pola[1]  = ImageIO.read(block);
 		zdj_pola[2]  = ImageIO.read(wall);
 		zdj_pola[5] = ImageIO.read(mysza);
 		zdj_pola[6] = ImageIO.read(kot);
+		zdj_pola[7] = ImageIO.read(kot_spi);
+		zdj_pola[8]= ImageIO.read(ser);
 		
 		}
 		catch(IOException e)
@@ -91,9 +107,9 @@ public class plansza extends JPanel implements KeyListener{
 	}
 		
 		public void wczytaj_level(){
-			String poziom="1";
+			String Stringpoziom=Integer.toString(poziom);
 			try {
-	            File f = new File("levels/level"+poziom+".txt");
+	            File f = new File("levels/level"+Stringpoziom+".txt");
 	            
 				Scanner sc = new Scanner(f);
 
@@ -137,17 +153,32 @@ public class plansza extends JPanel implements KeyListener{
 			switch(c){
 				case KeyEvent.VK_RIGHT:;
 					if(tablica[x+1][y]==1)move_block(x , y,1 , 0);
+					else if(tablica[x+1][y]==8) {
+						gracz.pozX++;
+						tablica[x+1][y]=0;
+						punkty+=100;
+					}
 					else if(tablica[x+1][y]!=0);
 					else gracz.pozX++;
 					break;
 				case KeyEvent.VK_UP:
 					if(tablica[x][y-1]==1)move_block(x , y,0 , -1);
+					else if(tablica[x][y-1]==8) {
+						gracz.pozY--;
+						tablica[x][y-1]=0;
+						punkty+=100;
+					}
 					else if(tablica[x][y-1]!=0);
 					else gracz.pozY--;
 					
 					break;
 				case KeyEvent.VK_LEFT:
 					if(tablica[x-1][y]==1)move_block(x , y,-1 , 0);
+					else if(tablica[x-1][y]==8) {
+						gracz.pozX--;
+						tablica[x-1][y]=0;
+						punkty+=100;
+					}
 					else if(tablica[x-1][y]!=0);
 					else gracz.pozX--;
 						
@@ -155,16 +186,22 @@ public class plansza extends JPanel implements KeyListener{
 					break;
 				case KeyEvent.VK_DOWN:
 					if(tablica[x][y+1]==1)move_block(x , y,0 , 1);
+					else if(tablica[x][y+1]==8) {
+						gracz.pozY++;
+						tablica[x][y+1]=0;
+						punkty+=100;
+					}
 					else if(tablica[x][y+1]!=0); 
 					else gracz.pozY++;
 					
 					break;
 				case KeyEvent.VK_SPACE:
-					spawn();
+					nastepny_level();
 					break;
 			
 		}
 			//this.repaint();
+			
 			repaint();
 	}
 
@@ -193,7 +230,7 @@ public class plansza extends JPanel implements KeyListener{
 			while (true) {
 				tempx+=zm_x;
 				tempy+=zm_y;
-				if(tablica[tempx][tempy]==0) break;
+				if(tablica[tempx][tempy]==0 || tablica[tempx][tempy]==8) break;
 				else if(tablica[tempx][tempy]==1) continue;
 				else return;
 			}
@@ -223,13 +260,102 @@ public class plansza extends JPanel implements KeyListener{
 			}
 			
 			aktualna_fala++;
-			if(aktualna_fala==fale.size())nastepny_level();
+			
 			
 			repaint();
 		}
 		
+		public void ruch_kota() {
+			koniec_fali=true;
+			for(kot k: kocury) {
+				tablica[k.pozX][k.pozY]=0;
+				if(k.pozX>gracz.pozX && tablica[k.pozX-1][k.pozY]==0)k.pozX--;
+				else if (k.pozX<gracz.pozX && tablica[k.pozX+1][k.pozY]==0)k.pozX++;
+				else if(k.pozY>gracz.pozY && tablica[k.pozX][k.pozY-1]==0)k.pozY--;
+				else if (k.pozY<gracz.pozY && tablica[k.pozX][k.pozY+1]==0)k.pozY++;
+				else losowy_ruch_kota(k);
+				
+				if(!k.sen) {
+					tablica[k.pozX][k.pozY]=6;
+					koniec_fali=false;
+				}
+				else tablica[k.pozX][k.pozY]=7;
+			}
+			
+			if(koniec_fali)kot_w_ser();
+		}
+		public void losowy_ruch_kota(kot k) {
+			Random rand= new Random();
+			int kierunek = rand.nextInt(3);
+			int tempX =k.pozX;
+			int tempY = k.pozY;
+			
+			for(int i=0 ; i<4 ; i++) {
+				switch(kierunek) {
+				case 0:
+					if(tablica[k.pozX][k.pozY+1]==0)k.pozY++;
+					else kierunek++;
+					break;
+				case 1:
+					if(tablica[k.pozX-1][k.pozY]==0)k.pozX--;
+					else kierunek++;
+					break;
+				case 2:
+					if(tablica[k.pozX][k.pozY-1]==0)k.pozY--;
+					else kierunek++;
+					break;
+				case 3:
+					if(tablica[k.pozX+1][k.pozY]==0)k.pozX++;
+					else kierunek=0;
+					break;
+				
+				}				
+			}
+			if(k.pozX==tempX && k.pozY==tempY) {
+				k.licznik++;
+				if(k.licznik==3) {
+					k.sen=true;
+					punkty+=10;
+				}
+			}
+			else {
+				k.licznik=0;
+				k.sen=false;
+			}
+			
+			
+			
+		}
+		public void kot_w_ser() {
+			for(kot k :kocury) {
+				    tablica[k.pozX][k.pozY]=8;                                                    
+			}
+			kocury.clear();
+			if(aktualna_fala==fale.size())nastepny_level();
+			else spawn();
+			
+		}
+		
 		public void nastepny_level() {
 			
-			JOptionPane.showMessageDialog(null, "konic fal", "tak", JOptionPane.INFORMATION_MESSAGE);
+		//	JOptionPane.showMessageDialog(null, "konic fal", "tak", JOptionPane.INFORMATION_MESSAGE);
+			poziom++;
+			kocury.clear();
+			fale.clear();
+			wczytaj_level();
+			gracz.pozX=11;
+			gracz.pozY=11;
+		}
+
+
+
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			if(ev.getSource()==Truch_kota){
+				ruch_kota();
+			      repaint();
+			      
+			    }
+			
 		}
 }
