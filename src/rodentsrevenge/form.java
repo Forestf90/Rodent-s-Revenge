@@ -11,7 +11,7 @@ public class form extends JFrame{
 	public form() {
 		super("Rodent's Revenge");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(384 ,406);
+		this.setSize(384 ,438);
 		this.setLayout(new BorderLayout());
 		
 		
