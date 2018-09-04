@@ -68,6 +68,7 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 		g.fillRect(0, 368, 368, 32);
 		g.setColor(Color.BLACK);
 		g.drawString("Punkty: "+punkty,5, 388);
+		g.drawString("Poziom "+poziom, 156, 388);
 		for(int i=0 ; i<gracz.zycia; i++) {
 			g.drawImage(live, 304+i*16, 376, null);
 		}
@@ -266,7 +267,7 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 							else spawn_myszy();
 							tablica[x][y+1]=0;
 						}
-						else if(tablica[x][y+1]==0)gracz.pozY++;; 
+						else if(tablica[x][y+1]==0)gracz.pozY++; 
 						
 						
 						break;
