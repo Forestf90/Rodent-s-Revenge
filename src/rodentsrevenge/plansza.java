@@ -274,6 +274,10 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 					case KeyEvent.VK_SPACE:
 						nastepny_level();
 						break;
+					case KeyEvent.VK_Q:
+						kot temp = kocury.get(0);
+						ArrayList<Node> trasa =Astar.wyznacz_trase(temp.pozX , temp.pozY , gracz.pozX , gracz.pozY ,tablica );
+						break;
 				
 			}
 				//this.repaint();
@@ -372,15 +376,24 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 		}
 		
 		public void ruch_kota() {
+			
 			koniec_fali=true;
 			for(kot k: kocury) {
 				tablica[k.pozX][k.pozY]=0;
-				if(k.pozX>gracz.pozX && tablica[k.pozX-1][k.pozY]==0)k.pozX--;
-				else if (k.pozX<gracz.pozX && tablica[k.pozX+1][k.pozY]==0)k.pozX++;
-				else if(k.pozY>gracz.pozY && tablica[k.pozX][k.pozY-1]==0)k.pozY--;
-				else if (k.pozY<gracz.pozY && tablica[k.pozX][k.pozY+1]==0)k.pozY++;
-				else losowy_ruch_kota(k);
-				
+				ArrayList<Node> trasa =Astar.wyznacz_trase(k.pozX ,k.pozY , gracz.pozX , gracz.pozY ,tablica );
+				if(trasa==null) {
+					if(k.pozX>gracz.pozX && tablica[k.pozX-1][k.pozY]==0)k.pozX--;
+					else if (k.pozX<gracz.pozX && tablica[k.pozX+1][k.pozY]==0)k.pozX++;
+					else if(k.pozY>gracz.pozY && tablica[k.pozX][k.pozY-1]==0)k.pozY--;
+					else if (k.pozY<gracz.pozY && tablica[k.pozX][k.pozY+1]==0)k.pozY++;
+					else losowy_ruch_kota(k);
+				}
+				else {
+					k.pozX=trasa.get(trasa.size()-2).x;
+					k.pozY = trasa.get(trasa.size()-2).y;
+					//k.pozX=trasa.get(1).x;
+					//k.pozY = trasa.get(1).y;
+				}
 				if(!k.sen) {
 					tablica[k.pozX][k.pozY]=6;
 					koniec_fali=false;
