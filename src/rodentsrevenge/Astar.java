@@ -1,5 +1,6 @@
 package rodentsrevenge;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -85,7 +86,12 @@ public class Astar {
 					}
 				}
 			}
-				
+			
+			if(otwarte.isEmpty()) {
+				trasa=null ;
+				zamkniete.removeAll(zamkniete);
+				return trasa;
+			}
 				Node temp= otwarte.get(0);
 			for(Node n: otwarte) {
 				
@@ -111,8 +117,10 @@ public class Astar {
 			kom+=System.lineSeparator() +"otwarte : "+otwarte.size();
 		//	JOptionPane.showMessageDialog(null, kom, "tak", JOptionPane.INFORMATION_MESSAGE);
 			
-			if(otwarte.size() ==0) {
+			if(otwarte.isEmpty()) {
 				trasa= null;
+				otwarte.removeAll(otwarte);
+				zamkniete.removeAll(zamkniete);
 				return trasa;
 			}
 			if( aktualny.heurystyka==0) {
@@ -128,6 +136,8 @@ public class Astar {
 					//komunikat +=System.lineSeparator();
 				}
 				//JOptionPane.showMessageDialog(null, komunikat, "tak", JOptionPane.INFORMATION_MESSAGE);
+				otwarte.removeAll(otwarte);
+				zamkniete.removeAll(zamkniete);
 				return trasa;
 				//break;
 			}

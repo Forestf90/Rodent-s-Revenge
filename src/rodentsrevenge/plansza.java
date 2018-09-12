@@ -50,7 +50,7 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 		wczytaj_zdjecia();
 		wczytaj_level();
 		punkty=0;
-		Truch_kota=new Timer(1000, this);
+		Truch_kota=new Timer(800, this);
 		Truch_kota.start();
 		spawn();
 	}
@@ -274,9 +274,9 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 					case KeyEvent.VK_SPACE:
 						nastepny_level();
 						break;
-					case KeyEvent.VK_Q:
-						kot temp = kocury.get(0);
-						ArrayList<Node> trasa =Astar.wyznacz_trase(temp.pozX , temp.pozY , gracz.pozX , gracz.pozY ,tablica );
+					case KeyEvent.VK_R:
+						poziom--;
+						nastepny_level();
 						break;
 				
 			}
@@ -391,8 +391,8 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 				else {
 					k.pozX=trasa.get(trasa.size()-2).x;
 					k.pozY = trasa.get(trasa.size()-2).y;
-					//k.pozX=trasa.get(1).x;
-					//k.pozY = trasa.get(1).y;
+				//	k.pozX=trasa.get(1).x;
+				//	k.pozY = trasa.get(1).y;
 				}
 				if(!k.sen) {
 					tablica[k.pozX][k.pozY]=6;
@@ -418,22 +418,34 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 			int tempX =k.pozX;
 			int tempY = k.pozY;
 			
-			for(int i=0 ; i<4 ; i++) {
+			loop: for(int i=0 ; i<4 ; i++) {
 				switch(kierunek) {
 				case 0:
-					if(tablica[k.pozX][k.pozY+1]==0)k.pozY++;
+					if(tablica[k.pozX][k.pozY+1]==0) {
+						k.pozY++;
+						break loop;
+					}
 					else kierunek++;
 					break;
 				case 1:
-					if(tablica[k.pozX-1][k.pozY]==0)k.pozX--;
+					if(tablica[k.pozX-1][k.pozY]==0) {
+						k.pozX--;
+						break loop;
+					}
 					else kierunek++;
 					break;
 				case 2:
-					if(tablica[k.pozX][k.pozY-1]==0)k.pozY--;
+					if(tablica[k.pozX][k.pozY-1]==0) {
+						k.pozY--;
+						break loop;
+					}
 					else kierunek++;
 					break;
 				case 3:
-					if(tablica[k.pozX+1][k.pozY]==0)k.pozX++;
+					if(tablica[k.pozX+1][k.pozY]==0) {
+						k.pozX++;
+						break loop;
+					}
 					else kierunek=0;
 					break;
 				
