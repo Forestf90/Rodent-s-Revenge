@@ -50,7 +50,7 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 		wczytaj_zdjecia();
 		wczytaj_level();
 		punkty=0;
-		Truch_kota=new Timer(800, this);
+		Truch_kota=new Timer(1000, this);
 		Truch_kota.start();
 		spawn();
 	}
@@ -125,6 +125,7 @@ public class plansza extends JPanel implements KeyListener, ActionListener{
 	}
 		
 		public void wczytaj_level(){
+			if(poziom ==16) poziom=1;
 			String Stringpoziom=Integer.toString(poziom);
 			try {
 	            File f = new File("levels/level"+Stringpoziom+".txt");
